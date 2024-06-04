@@ -1,88 +1,126 @@
-import streamlit as st # type: ignore
+import streamlit as st
+import pickle
+import pandas as pd
 
-# Load custom CSS
-def load_css(file_name):
-    with open(file_name) as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+# Load the models
+def load_model(file_name):
+    with open(file_name, "rb") as file:
+        return pickle.load(file)
 
-def main():
-    load_css('style.css')  # Load the CSS file
+model_GK = load_model("model_GK.pkl")
+model_FW = load_model("model_FW.pkl")
+model_DEF = load_model("model_DEF.pkl")
+model_MID = load_model("model_MID.pkl")
+
+# Load encoders for MID
+body_type_mid = load_model("body_type_mid.pkl")
+work_rate_mid = load_model("work_rate_mid.pkl")
+preferred_foot_mid = load_model("preferred_foot_mid.pkl")
+
+# Helper function to predict rating
+def predict(model, features):
+    df = pd.DataFrame([features])
+    return model.predict(df.values)[0]
+
+st.title("Player Position Rating Prediction")
+
+position = st.sidebar.selectbox("Select Player Position", ["Goalkeeper", "Forward", "Defender", "Midfielder"])
+
+if position == "Goalkeeper":
+    st.header("Goalkeeper Input")
+    league_rank = st.number_input("League Rank", min_value=1.0, step=1.0)
+    international_reputation = st.number_input("International Reputation", min_value=1, step=1)
+    weak_foot = st.number_input("Weak Foot", min_value=1, step=1)
+    body_type = st.number_input("Body Type", min_value=1, step=1)
+    movement_reactions = st.number_input("Movement Reactions", min_value=1, step=1)
+    power_shot_power = st.number_input("Power Shot Power", min_value=1, step=1)
+    GK_attribute = st.number_input("GK Attribute", min_value=1, step=1)
     
-    if 'page' not in st.session_state:
-        st.session_state.page = 'page1'
+    if st.button("Predict Rating"):
+        features = [league_rank, international_reputation, weak_foot, body_type, movement_reactions, power_shot_power, GK_attribute]
+        rating = predict(model_GK, features)
+        st.write(f"Predicted Rating: {rating}")
+
+elif position == "Forward":
+    st.header("Forward Input")
+    league_rank = st.number_input("League Rank", min_value=1.0, step=1.0)
+    international_reputation = st.number_input("International Reputation", min_value=1, step=1)
+    weak_foot = st.number_input("Weak Foot", min_value=1, step=1)
+    skill_moves = st.number_input("Skill Moves", min_value=1, step=1)
+    work_rate = st.number_input("Work Rate", min_value=1, step=1)
+    body_type = st.number_input("Body Type", min_value=1, step=1)
+    attacking_short_passing = st.number_input("Attacking Short Passing", min_value=1, step=1)
+    attacking_volleys = st.number_input("Attacking Volleys", min_value=1, step=1)
+    skill_ball_control = st.number_input("Skill Ball Control", min_value=1, step=1)
+    movement_reactions = st.number_input("Movement Reactions", min_value=1, step=1)
+    power_shot_power = st.number_input("Power Shot Power", min_value=1, step=1)
+    power_long_shots = st.number_input("Power Long Shots", min_value=1, step=1)
+    mentality_positioning = st.number_input("Mentality Positioning", min_value=1, step=1)
+    mentality_composure = st.number_input("Mentality Composure", min_value=1, step=1)
+    shooting = st.number_input("Shooting", min_value=1.0, step=1.0)
+    passing = st.number_input("Passing", min_value=1.0, step=1.0)
+    dribbling = st.number_input("Dribbling", min_value=1.0, step=1.0)
     
-    if st.session_state.page == 'page1':
-        page1()
-    elif st.session_state.page == 'page2':
-        page2()
-    elif st.session_state.page == 'page3':
-        page3()
+    if st.button("Predict Rating"):
+        features = [league_rank, international_reputation, weak_foot, skill_moves, work_rate, body_type, attacking_short_passing,
+                    attacking_volleys, skill_ball_control, movement_reactions, power_shot_power, power_long_shots, mentality_positioning,
+                    mentality_composure, shooting, passing, dribbling]
+        rating = predict(model_FW, features)
+        st.write(f"Predicted Rating: {rating}")
 
-def page1():
-    st.title("FIFA Player Prediction")
+elif position == "Defender":
+    st.header("Defender Input")
+    league_rank = st.number_input("League Rank", min_value=1.0, step=1.0)
+    international_reputation = st.number_input("International Reputation", min_value=1, step=1)
+    weak_foot = st.number_input("Weak Foot", min_value=1, step=1)
+    work_rate = st.number_input("Work Rate", min_value=1, step=1)
+    body_type = st.number_input("Body Type", min_value=1, step=1)
+    attacking_heading_accuracy = st.number_input("Attacking Heading Accuracy", min_value=1, step=1)
+    attacking_short_passing = st.number_input("Attacking Short Passing", min_value=1, step=1)
+    skill_ball_control = st.number_input("Skill Ball Control", min_value=1, step=1)
+    movement_reactions = st.number_input("Movement Reactions", min_value=1, step=1)
+    mentality_interceptions = st.number_input("Mentality Interceptions", min_value=1, step=1)
+    mentality_composure = st.number_input("Mentality Composure", min_value=1, step=1)
+    defending_sliding_tackle = st.number_input("Defending Sliding Tackle", min_value=1, step=1)
+    passing = st.number_input("Passing", min_value=1.0, step=1.0)
+    defending = st.number_input("Defending", min_value=1.0, step=1.0)
+    physic = st.number_input("Physic", min_value=1.0, step=1.0)
+    dribbling = st.number_input("Dribbling", min_value=1.0, step=1.0)
+    
+    if st.button("Predict Rating"):
+        features = [league_rank, international_reputation, weak_foot, work_rate, body_type, attacking_heading_accuracy, attacking_short_passing,
+                    skill_ball_control, movement_reactions, mentality_interceptions, mentality_composure, defending_sliding_tackle, passing, defending, physic, dribbling]
+        rating = predict(model_DEF, features)
+        st.write(f"Predicted Rating: {rating}")
 
-    with st.form(key='player_form'):
-        st.header("Enter Player Details")
-        first_name = st.text_input("First Name:", value=st.session_state.get('first_name', ''))
-        last_name = st.text_input("Last Name:", value=st.session_state.get('last_name', ''))
+elif position == "Midfielder":
+    st.header("Midfielder Input")
+    league_rank = st.number_input("League Rank", min_value=1.0, step=1.0)
+    international_reputation = st.number_input("International Reputation", min_value=1, step=1)
+    weak_foot = st.number_input("Weak Foot", min_value=1, step=1)
+    skill_moves = st.number_input("Skill Moves", min_value=1, step=1)
+    work_rate = st.selectbox("Work Rate", work_rate_mid.classes_)
+    body_type = st.selectbox("Body Type", body_type_mid.classes_)
+    preferred_foot = st.selectbox("Preferred Foot", preferred_foot_mid.classes_)
+    attacking_short_passing = st.number_input("Attacking Short Passing", min_value=1, step=1)
+    skill_dribbling = st.number_input("Skill Dribbling", min_value=1, step=1)
+    skill_long_passing = st.number_input("Skill Long Passing", min_value=1, step=1)
+    skill_ball_control = st.number_input("Skill Ball Control", min_value=1, step=1)
+    movement_reactions = st.number_input("Movement Reactions", min_value=1, step=1)
+    power_long_shots = st.number_input("Power Long Shots", min_value=1, step=1)
+    mentality_composure = st.number_input("Mentality Composure", min_value=1, step=1)
+    shooting = st.number_input("Shooting", min_value=1.0, step=1.0)
+    passing = st.number_input("Passing", min_value=1.0, step=1.0)
+    dribbling = st.number_input("Dribbling", min_value=1.0, step=1.0)
+    
+    if st.button("Predict Rating"):
+        features = [league_rank, international_reputation, weak_foot, skill_moves, work_rate, body_type, preferred_foot, attacking_short_passing, skill_dribbling,
+                    skill_long_passing, skill_ball_control, movement_reactions, power_long_shots, mentality_composure, shooting, passing, dribbling]
         
-        position = st.selectbox("Select Player Position:", 
-                                ["--Select Position--", "Goalkeeper", "Defender", "Midfielder", "Forward"], 
-                                index=["--Select Position--", "Goalkeeper", "Defender", "Midfielder", "Forward"].index(st.session_state.get('position', '--Select Position--')))
-
-        next_button = st.form_submit_button(label='Next')
-    
-    if next_button:
-        if position == "--Select Position--":
-            st.warning("Please select a valid position.")
-        else:
-            st.session_state.first_name = first_name
-            st.session_state.last_name = last_name
-            st.session_state.position = position
-            st.session_state.page = 'page2'
-            st.experimental_rerun()
-
-def page2():
-    st.title("FIFA Player Prediction")
-    st.header(f"Enter Characteristics for {st.session_state.position}")
-
-    with st.form(key='characteristics_form'):
-        if st.session_state.position == 'Goalkeeper':
-            league_rank = st.number_input("League Rank:", min_value=1, max_value=10, value=st.session_state.get('league_rank', 1))
-            international_reputation = st.number_input("International Reputation:", min_value=1, max_value=5, value=st.session_state.get('international_reputation', 1))
-            weak_foot = st.number_input("Weak Foot:", min_value=1, max_value=5, value=st.session_state.get('weak_foot', 1))
-            body_type = st.text_input("Body Type:", value=st.session_state.get('body_type', '1'))
-            movement_reactions = st.number_input("Movement Reactions:", min_value=0, max_value=100, value=st.session_state.get('movement_reactions', 60))
-            power_shot_power = st.number_input("Power Shot Power:", min_value=0, max_value=100, value=st.session_state.get('power_shot_power', 60))
-            GK_attribute = st.number_input("GK Attribute:", min_value=0, max_value=100, value=st.session_state.get('GK_attribute', 60))
-        # Add additional forms for other positions as needed
+        df = pd.DataFrame([features])
+        df[4] = work_rate_mid.transform(df[4])
+        df[5] = body_type_mid.transform(df[5])
+        df[6] = preferred_foot_mid.transform(df[6])
         
-        next_button = st.form_submit_button(label='Next')
-    
-    if next_button:
-        st.session_state.league_rank = league_rank
-        st.session_state.international_reputation = international_reputation
-        st.session_state.weak_foot = weak_foot
-        st.session_state.body_type = body_type
-        st.session_state.movement_reactions = movement_reactions
-        st.session_state.power_shot_power = power_shot_power
-        st.session_state.GK_attribute = GK_attribute
-        st.session_state.page = 'page3'
-        st.experimental_rerun()
-
-def page3():
-    st.title("FIFA Player Prediction")
-    st.header("Predicted Rating")
-
-    # Placeholder for the prediction logic
-    rating = predict_rating()
-    
-    st.write(f"The predicted rating of the player is {rating}")
-
-def predict_rating():
-    # Placeholder for the actual prediction logic
-    # Here, just a mock prediction is returned
-    return 85
-
-if __name__ == "__main__":
-    main()
+        rating = predict(model_MID, df.values[0])
+        st.write(f"Predicted Rating: {rating}")
