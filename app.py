@@ -2,6 +2,13 @@ import streamlit as st
 import pickle
 import pandas as pd
 
+# Load custom CSS
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+local_css("style.css")
+
 # Load the models
 def load_model(file_name):
     with open(file_name, "rb") as file:
