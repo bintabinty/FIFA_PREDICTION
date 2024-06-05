@@ -9,20 +9,33 @@ def local_css(file_name):
 
 local_css("style.css")
 
-# Load the models
-def load_model(file_name):
+# Function to load the models and encoders
+def load_pickle(file_name):
     with open(file_name, "rb") as file:
         return pickle.load(file)
 
-model_GK = load_model("model_GK.pkl")
-model_FW = load_model("model_FW.pkl")
-model_DEF = load_model("model_DEF.pkl")
-model_MID = load_model("model_MID.pkl")
+# Load the models
+model_GK = load_pickle("model_GK.pkl")
+model_FW = load_pickle("model_FW.pkl")
+model_DEF = load_pickle("model_DEF.pkl")
+model_MID = load_pickle("model_MID.pkl")
 
-# Load encoders for MID
-body_type_mid = load_model("body_type_mid.pkl")
-work_rate_mid = load_model("work_rate_mid.pkl")
-preferred_foot_mid = load_model("preferred_foot_mid.pkl")
+# Load encoders
+body_type_mid = load_pickle("body_type_mid.pkl")
+work_rate_mid = load_pickle("work_rate_mid.pkl")
+preferred_foot_mid = load_pickle("preferred_foot_mid.pkl")
+
+body_type_gk = load_pickle("body_typegk.pkl")
+work_rate_gk = load_pickle("work_rate.pkl")
+preferred_foot_gk = load_pickle("preferred_foot_gk.pkl")
+
+body_type_fw = load_pickle("body_type_fw.pkl")
+work_rate_fw = load_pickle("work_rate_fw.pkl")
+preferred_foot_fw = load_pickle("preferred_foot_fw.pkl")
+
+body_type_def = load_pickle("body_type_def.pkl")
+work_rate_def = load_pickle("work_rate_def.pkl")
+preferred_foot_def = load_pickle("preferred_foot_def.pkl")
 
 # Helper function to predict rating
 def predict(model, features):
@@ -38,13 +51,13 @@ if position == "Goalkeeper":
     league_rank = st.number_input("League Rank", min_value=1.0, step=1.0)
     international_reputation = st.number_input("International Reputation", min_value=1, step=1)
     weak_foot = st.number_input("Weak Foot", min_value=1, step=1)
-    body_type = st.number_input("Body Type", min_value=1, step=1)
+    body_type = st.selectbox("Body Type", body_type_gk.classes_)
     movement_reactions = st.number_input("Movement Reactions", min_value=1, step=1)
     power_shot_power = st.number_input("Power Shot Power", min_value=1, step=1)
     GK_attribute = st.number_input("GK Attribute", min_value=1, step=1)
     
     if st.button("Predict Rating"):
-        features = [league_rank, international_reputation, weak_foot, body_type, movement_reactions, power_shot_power, GK_attribute]
+        features = [league_rank, international_reputation, weak_foot, body_type_gk.transform([body_type])[0], movement_reactions, power_shot_power, GK_attribute]
         rating = predict(model_GK, features)
         st.write(f"Predicted Rating: {rating}")
 
@@ -54,8 +67,8 @@ elif position == "Forward":
     international_reputation = st.number_input("International Reputation", min_value=1, step=1)
     weak_foot = st.number_input("Weak Foot", min_value=1, step=1)
     skill_moves = st.number_input("Skill Moves", min_value=1, step=1)
-    work_rate = st.number_input("Work Rate", min_value=1, step=1)
-    body_type = st.number_input("Body Type", min_value=1, step=1)
+    work_rate = st.selectbox("Work Rate", work_rate_fw.classes_)
+    body_type = st.selectbox("Body Type", body_type_fw.classes_)
     attacking_short_passing = st.number_input("Attacking Short Passing", min_value=1, step=1)
     attacking_volleys = st.number_input("Attacking Volleys", min_value=1, step=1)
     skill_ball_control = st.number_input("Skill Ball Control", min_value=1, step=1)
@@ -69,7 +82,7 @@ elif position == "Forward":
     dribbling = st.number_input("Dribbling", min_value=1.0, step=1.0)
     
     if st.button("Predict Rating"):
-        features = [league_rank, international_reputation, weak_foot, skill_moves, work_rate, body_type, attacking_short_passing,
+        features = [league_rank, international_reputation, weak_foot, skill_moves, work_rate_fw.transform([work_rate])[0], body_type_fw.transform([body_type])[0], attacking_short_passing,
                     attacking_volleys, skill_ball_control, movement_reactions, power_shot_power, power_long_shots, mentality_positioning,
                     mentality_composure, shooting, passing, dribbling]
         rating = predict(model_FW, features)
@@ -80,8 +93,8 @@ elif position == "Defender":
     league_rank = st.number_input("League Rank", min_value=1.0, step=1.0)
     international_reputation = st.number_input("International Reputation", min_value=1, step=1)
     weak_foot = st.number_input("Weak Foot", min_value=1, step=1)
-    work_rate = st.number_input("Work Rate", min_value=1, step=1)
-    body_type = st.number_input("Body Type", min_value=1, step=1)
+    work_rate = st.selectbox("Work Rate", work_rate_def.classes_)
+    body_type = st.selectbox("Body Type", body_type_def.classes_)
     attacking_heading_accuracy = st.number_input("Attacking Heading Accuracy", min_value=1, step=1)
     attacking_short_passing = st.number_input("Attacking Short Passing", min_value=1, step=1)
     skill_ball_control = st.number_input("Skill Ball Control", min_value=1, step=1)
@@ -95,7 +108,7 @@ elif position == "Defender":
     dribbling = st.number_input("Dribbling", min_value=1.0, step=1.0)
     
     if st.button("Predict Rating"):
-        features = [league_rank, international_reputation, weak_foot, work_rate, body_type, attacking_heading_accuracy, attacking_short_passing,
+        features = [league_rank, international_reputation, weak_foot, work_rate_def.transform([work_rate])[0], body_type_def.transform([body_type])[0], attacking_heading_accuracy, attacking_short_passing,
                     skill_ball_control, movement_reactions, mentality_interceptions, mentality_composure, defending_sliding_tackle, passing, defending, physic, dribbling]
         rating = predict(model_DEF, features)
         st.write(f"Predicted Rating: {rating}")
@@ -121,13 +134,7 @@ elif position == "Midfielder":
     dribbling = st.number_input("Dribbling", min_value=1.0, step=1.0)
     
     if st.button("Predict Rating"):
-        features = [league_rank, international_reputation, weak_foot, skill_moves, work_rate, body_type, preferred_foot, attacking_short_passing, skill_dribbling,
+        features = [league_rank, international_reputation, weak_foot, skill_moves, work_rate_mid.transform([work_rate])[0], body_type_mid.transform([body_type])[0], preferred_foot_mid.transform([preferred_foot])[0], attacking_short_passing, skill_dribbling,
                     skill_long_passing, skill_ball_control, movement_reactions, power_long_shots, mentality_composure, shooting, passing, dribbling]
-        
-        df = pd.DataFrame([features])
-        df[4] = work_rate_mid.transform(df[4])
-        df[5] = body_type_mid.transform(df[5])
-        df[6] = preferred_foot_mid.transform(df[6])
-        
-        rating = predict(model_MID, df.values[0])
+        rating = predict(model_MID, features)
         st.write(f"Predicted Rating: {rating}")
