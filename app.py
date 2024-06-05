@@ -26,16 +26,12 @@ work_rate_mid = load_pickle("work_rate_mid.pkl")
 preferred_foot_mid = load_pickle("preferred_foot_mid.pkl")
 
 body_type_gk = load_pickle("body_typegk.pkl")
-work_rate_gk = load_pickle("work_rate.pkl")
-preferred_foot_gk = load_pickle("preferred_foot_gk.pkl")
 
-body_type_fw = load_pickle("body_type_fw.pkl")
-work_rate_fw = load_pickle("work_rate_fw.pkl")
-preferred_foot_fw = load_pickle("preferred_foot_fw.pkl")
+body_type_fw = load_pickle("body_type.pkl")
+work_rate_fw = load_pickle("work_rate.pkl")
 
 body_type_def = load_pickle("body_type_def.pkl")
 work_rate_def = load_pickle("work_rate_def.pkl")
-preferred_foot_def = load_pickle("preferred_foot_def.pkl")
 
 # Helper function to predict rating
 def predict(model, features):
