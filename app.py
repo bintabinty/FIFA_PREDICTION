@@ -1,7 +1,6 @@
 import streamlit as st
 import pickle
 import pandas as pd
-import math
 
 # Load custom CSS
 def local_css(file_name):
@@ -67,15 +66,16 @@ if position == "Goalkeeper":
             goalkeeping_reflexes
         ]
         rating = predict(model_GK, features)
-        truncated_rating = math.trunc(rating)
-        st.write(f"Predicted Rating: {truncated_rating}")
+        truncated_rating = int(rating)
+        if 1 < truncated_rating < 100:
+            st.write(f"Predicted Rating: {truncated_rating}")
+        else:
+            st.write(f"**Prediction out of range**")
 
 elif position == 'Forward':
     st.header('Forward Input')
     league_rank = st.number_input("League Rank", min_value=1, max_value=5, step=1)
-    international_reputation = st.number_input("International Reputation", min_value=1, max_value=5, step=1)
     weak_foot = st.number_input("Weak Foot", min_value=1, max_value=5, step=1)
-    skill_moves = st.number_input("Skill Moves", min_value=1, max_value=5, step=1)
     work_rate = st.selectbox("Work Rate", work_rate_fw.classes_)
     attacking_volleys = st.number_input("Attacking Volleys", min_value=1, max_value=100, step=1)
     movement_reactions = st.number_input("Movement Reactions", min_value=1, max_value=100, step=1)
@@ -92,9 +92,7 @@ elif position == 'Forward':
     if st.button("Predict Rating"):
         features = [
             league_rank, 
-            international_reputation,
             weak_foot,
-            skill_moves,
             work_rate_fw.transform([work_rate])[0],
             attacking_volleys,
             movement_reactions,
@@ -109,13 +107,15 @@ elif position == 'Forward':
             cf
         ]
         rating = predict(model_FW, features)
-        truncated_rating = math.trunc(rating)
-        st.write(f"Predicted Rating: {truncated_rating}")
+        truncated_rating = int(rating)
+        if 1 < truncated_rating < 100:
+            st.write(f"Predicted Rating: {truncated_rating}")
+        else:
+            st.write(f"**Prediction out of range**")
 
 elif position == "Defender":
     st.header("Defender Input")
     league_rank = st.number_input("League Rank", min_value=1, max_value=5, step=1)
-    international_reputation = st.number_input("International Reputation", min_value=1, max_value=5, step=1)
     weak_foot = st.number_input("Weak Foot", min_value=1, max_value=5, step=1)
     work_rate = st.selectbox("Work Rate", work_rate_def.classes_)
     attacking_short_passing = st.number_input("Attacking Short Passing", min_value=1, max_value=100, step=1)
@@ -132,7 +132,6 @@ elif position == "Defender":
     if st.button("Predict Rating"):
         features = [
             league_rank, 
-            international_reputation,
             weak_foot,
             work_rate_def.transform([work_rate])[0],
             attacking_short_passing,
@@ -147,15 +146,16 @@ elif position == "Defender":
             lwb
         ]
         rating = predict(model_DEF, features)
-        truncated_rating = math.trunc(rating)
-        st.write(f"Predicted Rating: {truncated_rating}")
+        truncated_rating = int(rating)
+        if 1 < truncated_rating < 100:
+            st.write(f"Predicted Rating: {truncated_rating}")
+        else:
+            st.write(f"**Prediction out of range**")
 
 elif position == "Midfielder":
     st.header("Midfielder Input")
     league_rank = st.number_input("League Rank", min_value=1, max_value=5, step=1)
-    international_reputation = st.number_input("International Reputation", min_value=1, max_value=5, step=1)
     weak_foot = st.number_input("Weak Foot", min_value=1, max_value=5, step=1)
-    skill_moves = st.number_input("Skill Moves", min_value=1, max_value=5, step=1)
     work_rate = st.selectbox("Work Rate", work_rate_mid.classes_)
     preferred_foot = st.selectbox("Preferred Foot", preferred_foot_mid.classes_)
     skill_long_passing = st.number_input("Skill Long Passing", min_value=1, max_value=100, step=1)
@@ -170,9 +170,7 @@ elif position == "Midfielder":
     if st.button("Predict Rating"):
         features = [
             league_rank, 
-            international_reputation,
             weak_foot,
-            skill_moves,
             work_rate_mid.transform([work_rate])[0],
             preferred_foot_mid.transform([preferred_foot])[0],
             skill_long_passing,
@@ -185,5 +183,8 @@ elif position == "Midfielder":
             lm
         ]
         rating = predict(model_MID, features)
-        truncated_rating = math.trunc(rating)
-        st.write(f"Predicted Rating: {truncated_rating}")
+        truncated_rating = int(rating)
+        if 1 < truncated_rating < 100:
+            st.write(f"Predicted Rating: {truncated_rating}")
+        else:
+            st.write(f"**Prediction out of range**")
